@@ -1,0 +1,1108 @@
+
+library(tidyr)
+library(dplyr)
+library(tidyverse)
+install.packages("quantmod")
+install.packages("plyr")
+library(quantmod)
+library(plyr)
+install.packages("urca")
+library("urca")
+install.packages("tseries", dependencies = TRUE)
+library('tseries')
+
+library(lubridate)
+
+
+datdat<- as.data.frame(data10)
+datdat
+class(datdat)
+as.Date(as.character(datdat[,"date"]))
+
+
+ADF<- xts(datdat[,3],order.by=as.Date(datdat[,1]))
+ADF
+
+adf.test(ADF, alternative='stationary', k=1)   
+
+data:  ADF
+Dickey-Fuller = -2.1775, Lag order = 1, p-value = 0.5025
+alternative hypothesis: stationary
+
+
+adf.test(ADF, alternative='stationary', k=12)
+
+data11<- log(data10$a)
+data11
+data12<- diff(data10$a)
+adf.test(data12, alternative='stationary', k=1)
+
+data:  data12
+Dickey-Fuller = -7.828, Lag order = 1, p-value = 0.01 - ????????????????????????
+alternative hypothesis: stationary
+
+
+ADF2<- xts(datdat[,2],order.by=as.Date(datdat[,1]))
+ADF2
+
+
+adf.test(ADF2, alternative='stationary', k=1)
+
+
+ADF3<- xts(datdat[,4],order.by=as.Date(datdat[,1]))
+ADF3
+
+
+adf.test(ADF3, alternative='stationary', k=1)
+
+
+
+
+summary(ur.df(ADF3, "trend", lag=1))
+summary(ur.df(ADF3, "none", lag=1))
+
+
+summary(ur.df(ADF2, "drift", lag=1))
+summary(ur.df(ADF2, "trend", lag=1))
+
+
+summary(ur.df(ADF, "drift", lag=1))
+summary(ur.df(ADF, "trend", lag=1))
+
+
+
+ADF11 <- log(datdat$a))
+
+
+ADF22 <- as.data.frame(log(datdat$b))
+ADF22
+
+
+ADF33 <- as.data.frame(log(datdat$c))
+ADF33
+
+ADF11$date<- datdat$date
+ADF11
+
+ADF22$date<- datdat$date
+ADF33$date<- datdat$date
+
+ADF111<- xts(ADF11[,2],order.by=as.Date(datdat[,1]))
+ADF222<- xts(ADF22[,2],order.by=as.Date(datdat[,1]))
+ADF333<- xts(ADF33[,2],order.by=as.Date(datdat[,1]))
+
+
+summary(ur.df(ADF11$`log(datdat$a)`, "drift", lag=1))
+summary(ur.df(ADF11$`log(datdat$a)`, "trend", lag=1))
+
+summary(ur.df(ADF22$`log(datdat$b)`, "drift", lag=1))
+summary(ur.df(ADF22$`log(datdat$b)`, "trend", lag=1))
+
+
+summary(ur.df(ADF33$`log(datdat$c)`, "drift", lag=1))
+summary(ur.df(ADF33$`log(datdat$c)`, "trend", lag=1))
+
+
+
+
+kpss.1 <- ur.kpss(as.vector (ADF11$`log(datdat$a)`), type="tau", lags="short")  - # tau -constant with linear trend 
+summary(kpss.1)
+kpss.2 <- ur.kpss(as.vector (ADF11$`log(datdat$a)`), type="mu", lags="short")  - # tau -constant with linear trend 
+  summary(kpss.2)
+
+
+
+
+
+kpss.3 <- ur.kpss(as.vector (ADF22$`log(datdat$b)`), type="tau", lags="short")
+summary(kpss.3)
+kpss.4 <- ur.kpss(as.vector (ADF22$`log(datdat$b)`), type="mu", lags="short")  - # tau -constant with linear trend 
+  summary(kpss.4)
+
+
+
+
+
+kpss.5 <- ur.kpss(as.vector (ADF33$`log(datdat$c)`), type="tau", lags="short")
+summary(kpss.1)
+kpss.6 <- ur.kpss(as.vector (ADF33$`log(datdat$c)`), type="mu", lags="short")  - # tau -constant with linear trend 
+  summary(kpss.2)
+
+
+colnames(ADF2)<- c("aa")
+ADF2
+kpss.7 <- ur.kpss(as.vector(ADF2$'aa'), type="tau", lags="short")
+summary(kpss.7)
+
+kpss.8 <- ur.kpss(as.vector(ADF2$'aa'), type="mu", lags="short")
+summary(kpss.8)
+
+
+
+colnames(ADF)<- c("aa")
+kpss.9 <- ur.kpss(as.vector(ADF$'aa'), type="tau", lags="short")
+summary(kpss.9)
+
+
+kpss.10 <- ur.kpss(as.vector(ADF$'aa'), type="mu", lags="short")
+summary(kpss.10)
+
+colnames(ADF3)<- c("aa")
+kpss.11 <- ur.kpss(as.vector(ADF3$'aa'), type="tau", lags="short")
+summary(kpss.11)
+
+kpss.12 <- ur.kpss(as.vector(ADF3$'aa'), type="mu", lags="short")
+summary(kpss.12)
+
+
+eurusd<- as.data.frame(EURUSD)
+eurusd
+monthly<- aggregate(eurusd$Eurusd ~ YR + MO, FUN=mean, data=eurusd)
+monthly
+
+monthly_mean <- ddply(eurusd, .("%Y","%m"), summarise, mean_temp = mean(eurusd$Eurusd))
+monthly_mean
+
+
+
+
+ADF22 <- as.data.frame(log(datdat$b))
+ADF22
+
+
+series1 <- as.data.frame(series)
+series
+
+#NORD STREAM
+
+ersns00 <- ur.ers(series1$NS, type="DF-GLS", model="const", lag.max=1)
+summary(ersns00)
+
+ersns0 <- ur.ers(series1$NS, type="DF-GLS", model="trend", lag.max=1)
+summary(ersns0)
+
+kpssns1 <- ur.kpss(as.vector(series1$NS), type="mu", lags="short")
+summary(kpssns1)
+
+
+kpssns2 <- ur.kpss(as.vector(series1$NS), type="mu", lags="short")
+summary(kpssns2)
+
+
+
+#CZECH REP
+
+ersns1 <- ur.ers(series1$Czch, type="DF-GLS", model="const", lag.max=1)
+summary(ersns1)
+
+ersns2 <- ur.ers(series1$Czch, type="DF-GLS", model="trend", lag.max=1)
+summary(ersns2)
+
+
+kpssns1 <- ur.kpss(as.vector(series1$Czch), type="mu", lags="short")
+summary(kpssns1)
+
+
+kpssns2 <- ur.kpss(as.vector(series1$Czch), type="tau", lags="short")
+summary(kpssns2)
+
+
+
+#LATVIA
+
+erslat1 <- ur.ers(series1$Lat, type="DF-GLS", model="const", lag.max=1)
+summary(erslat1)
+
+erslat2 <- ur.ers(series1$Lat, type="DF-GLS", model="trend", lag.max=1)
+summary(erslat2)
+
+
+kpsslat1 <- ur.kpss(as.vector(series1$Lat), type="mu", lags="short")
+summary(kpsslat1)
+
+
+kpsslat2 <- ur.kpss(as.vector(series1$Lat), type="tau", lags="short")
+summary(kpsslat2)
+
+
+#GASPOOL
+
+
+
+ersgpl1 <- ur.ers(series1$GPL, type="DF-GLS", model="const", lag.max=1)
+summary(ersgpl1)
+
+ersgpl2 <- ur.ers(series1$GPL, type="DF-GLS", model="trend", lag.max=1)
+summary(ersgpl2)
+
+
+kpssgpl1 <- ur.kpss(as.vector(series1$GPL), type="mu", lags="short")
+summary(kpssgpl1)
+
+
+kpssgpl2 <- ur.kpss(as.vector(series1$GPL), type="tau", lags="short")
+summary(kpssgpl2)
+
+#TTF
+
+ersttf1 <- ur.ers(series1$TTF, type="DF-GLS", model="const", lag.max=1)
+summary(ersttf1)
+
+ersttf2 <- ur.ers(series1$TTF, type="DF-GLS", model="trend", lag.max=1)
+summary(ersttf2)
+
+
+kpssttf1 <- ur.kpss(as.vector(series1$TTF), type="mu", lags="short")
+summary(kpssttf1)
+
+
+kpssttf2 <- ur.kpss(as.vector(series1$TTF), type="tau", lags="short")
+summary(kpssttf2)
+
+
+#NCG
+ersncg1 <- ur.ers(series1$NCG, type="DF-GLS", model="const", lag.max=1)
+summary(ersncg1)
+
+ersncg2 <- ur.ers(series1$NCG, type="DF-GLS", model="trend", lag.max=1)
+summary(ersncg2)
+
+
+kpssncg1 <- ur.kpss(as.vector(series1$NCG), type="mu", lags="short")
+summary(kpssncg1)
+
+
+kpssncg2 <- ur.kpss(as.vector(series1$NCG), type="tau", lags="short")
+summary(kpssncg2)
+
+
+
+#LNG
+
+
+erslng1 <- ur.ers(series1$LNG, type="DF-GLS", model="const", lag.max=1)
+summary(erslng1)
+
+erslng2 <- ur.ers(series1$LNG, type="DF-GLS", model="trend", lag.max=1)
+summary(erslng2)
+
+
+kpsslng1 <- ur.kpss(as.vector(series1$LNG), type="mu", lags="short")
+summary(kpsslng1)
+
+
+kpsslng2 <- ur.kpss(as.vector(series1$LNG), type="tau", lags="short")
+summary(kpsslng2)
+
+
+#HH
+
+erslng1 <- ur.ers(series1$HH, type="DF-GLS", model="const", lag.max=1)
+summary(erslng1)
+
+erslng2 <- ur.ers(series1$HH, type="DF-GLS", model="trend", lag.max=1)
+summary(erslng2)
+
+
+kpsslng1 <- ur.kpss(as.vector(series1$HH), type="mu", lags="short")
+summary(kpsslng1)
+
+
+kpsslng2 <- ur.kpss(as.vector(series1$HH), type="tau", lags="short")
+summary(kpsslng2)
+
+
+
+
+#BRENT
+
+
+ersbr1 <- ur.ers(series1$Brent, type="DF-GLS", model="const", lag.max=1)
+summary(ersbr1)
+
+ersbr2 <- ur.ers(series1$Brent, type="DF-GLS", model="trend", lag.max=1)
+summary(ersbr2)
+
+
+kpssbr1 <- ur.kpss(as.vector(series1$Brent), type="mu", lags="short")
+summary(kpssbr1)
+
+
+kpssbr2 <- ur.kpss(as.vector(series1$Brent), type="tau", lags="short")
+summary(kpssbr2)
+
+
+
+
+
+
+
+
+#TEST OF COINTEGRATION, FIRST REGRESSION MODEL 
+
+
+#NS-NCG
+install.packages("dynlm")
+library(dynlm)
+FS1<- log(series1$NS, base = exp(1))
+FS2<-  log(series1$NCG, base = exp(1))
+
+
+
+FS_EGADF <- dynlm( window(FS1) ~ window(FS2))
+FS_EGADF
+
+#NS= -0.0004 + 0.29NCG
+
+z_hat <- resid(FS_EGADF)
+ur.df(z_hat, lags = 1, type = "none", selectlags = "AIC")
+#The value of the test statistic is: -11.078  - cointegration
+
+#NS-GPL
+
+FS3<- log(series1$NS, base = exp(1))
+FS4<-  log(series1$GPL, base = exp(1))
+
+FS_EGADF1 <- dynlm( window(FS3) ~ window(FS4))
+FS_EGADF1
+
+z_hat1 <- resid(FS_EGADF1)
+ur.df(z_hat1, lags = 1, type = "none", selectlags = "AIC")
+
+
+  #NS-TTF 
+
+FS5<- log(series1$NS, base = exp(1))
+FS6<-  log(series1$TTF, base = exp(1))
+
+FS_EGADF2 <- dynlm( window(FS5) ~ window(FS6))
+FS_EGADF2
+
+z_hat2 <- resid(FS_EGADF2)
+ur.df(z_hat2, lags = 1, type = "none", selectlags = "AIC")
+
+
+  #NS-BRENT 
+
+
+FS7<- log(series1$NS, base = exp(1))
+FS8<-  log(series1$Brent, base = exp(1))
+
+FS_EGADF3 <- dynlm( window(FS7) ~ window(FS8))
+FS_EGADF3
+
+z_hat3 <- resid(FS_EGADF3)
+ur.df(z_hat3, lags = 1, type = "none", selectlags = "AIC")
+
+
+  #CZH-NCG  
+
+FS9<- log(series1$Czch, base = exp(1))
+FS10<-  log(series1$NCG, base = exp(1))
+
+FS_EGADF4 <- dynlm( window(FS9) ~ window(FS10))
+FS_EGADF4
+
+z_hat4 <- resid(FS_EGADF4)
+ur.df(z_hat4, lags = 1, type = "none", selectlags = "AIC")
+
+
+  #LAT-NCG 
+FS11<- log(series1$Lat, base = exp(1))
+FS12<-  log(series1$NCG, base = exp(1))
+
+FS_EGADF5 <- dynlm( window(FS11) ~ window(FS12))
+FS_EGADF5
+
+z_hat5 <- resid(FS_EGADF5)
+ur.df(z_hat5, lags = 1, type = "none", selectlags = "AIC")
+
+
+
+
+  #HH-NCG 
+
+FS13<- log(series1$HH, base = exp(1))
+FS14<-  log(series1$NCG, base = exp(1))
+
+FS_EGADF6 <- dynlm( window(FS13) ~ window(FS14))
+FS_EGADF6
+
+z_hat6 <- resid(FS_EGADF6)
+ur.df(z_hat6, lags = 1, type = "none", selectlags = "AIC")
+
+
+
+
+
+
+  #HH-GPL 
+
+
+
+FS15<- log(series1$HH, base = exp(1))
+FS16<-  log(series1$GPL, base = exp(1))
+
+FS_EGADF7 <- dynlm( window(FS15) ~ window(FS16))
+FS_EGADF7
+
+z_hat7 <- resid(FS_EGADF7)
+ur.df(z_hat7, lags = 1, type = "none", selectlags = "AIC")
+
+
+  #HH-TTF 
+
+
+FS17<- log(series1$HH, base = exp(1))
+FS18<-  log(series1$TTF, base = exp(1))
+
+FS_EGADF8 <- dynlm( window(FS17) ~ window(FS18))
+FS_EGADF8
+
+z_hat8 <- resid(FS_EGADF8)
+ur.df(z_hat8, lags = 1, type = "none", selectlags = "AIC")
+
+
+  #LNG-TTF
+
+FS19<- log(series1$LNG, base = exp(1))
+FS20<-  log(series1$TTF, base = exp(1))
+
+FS_EGADF9 <- dynlm( window(FS19) ~ window(FS20))
+FS_EGADF9
+
+z_hat9 <- resid(FS_EGADF9)
+ur.df(z_hat9, lags = 1, type = "none", selectlags = "AIC")
+
+
+  #LNG-HH 
+
+FS21<- log(series1$LNG, base = exp(1))
+FS22<-  log(series1$HH, base = exp(1))
+
+FS_EGADF10 <- dynlm( window(FS21) ~ window(FS2))
+FS_EGADF10
+
+z_hat10 <- resid(FS_EGADF10)
+ur.df(z_hat10, lags = 1, type = "none", selectlags = "AIC")
+
+
+  #BRENT-NCG
+
+FS23<- log(series1$Brent, base = exp(1))
+FS24<-  log(series1$NCG, base = exp(1))
+
+FS_EGADF11 <- dynlm( window(FS23) ~ window(FS24))
+FS_EGADF11
+
+z_hat11 <- resid(FS_EGADF11)
+ur.df(z_hat11, lags = 1, type = "none", selectlags = "AIC")
+
+
+  #Brent-GPL 
+
+FS25<- log(series1$Brent, base = exp(1))
+FS26<-  log(series1$GPL, base = exp(1))
+
+FS_EGADF12 <- dynlm( window(FS25) ~ window(FS26))
+FS_EGADF12
+
+z_hat12 <- resid(FS_EGADF12)
+ur.df(z_hat12, lags = 1, type = "none", selectlags = "AIC")
+
+ 
+
+ #Brent-TTF
+  
+FS27<- log(series1$Brent, base = exp(1))
+FS28<-  log(series1$TTF, base = exp(1))
+
+FS_EGADF13 <- dynlm( window(FS27) ~ window(FS28))
+FS_EGADF13
+
+z_hat13 <- resid(FS_EGADF13)
+ur.df(z_hat13, lags = 1, type = "none", selectlags = "AIC")
+
+
+#PRISE PAIRS 
+
+difr<- as.data.frame(X0814)
+X0814
+
+# NS_NCG
+
+ersnsncg1 <- ur.ers(difr$nsncg, type="DF-GLS", model="const", lag.max=1)
+summary(ersnsncg1)
+
+ersnsncg2 <- ur.ers(difr$nsncg, type="DF-GLS", model="trend", lag.max=1)
+summary(ersnsncg2)
+
+
+kpssnsncg1 <- ur.kpss(as.vector(difr$nsncg), type="mu", lags="short")
+summary(kpssnsncg1)
+
+
+kpssnsncg2 <- ur.kpss(as.vector(difr$nsncg), type="tau", lags="short")
+summary(kpssnsncg2)
+
+
+
+#NS-GPL
+
+
+ersnsgpl1 <- ur.ers(difr$nsgpl, type="DF-GLS", model="const", lag.max=1)
+summary(ersnsgpl1)
+
+ersnsgpl2 <- ur.ers(difr$nsgpl, type="DF-GLS", model="trend", lag.max=1)
+summary(ersnsgpl2)
+
+
+kpssnsgpl1 <- ur.kpss(as.vector(difr$nsgpl), type="mu", lags="short")
+summary(kpssnsgpl1)
+
+
+kpssnsgpl2 <- ur.kpss(as.vector(difr$nsgpl), type="tau", lags="short")
+summary(kpssnsgpl2)
+
+
+
+
+
+
+#NS-TTF
+
+
+ersnsttf1 <- ur.ers(difr$nsttf, type="DF-GLS", model="const", lag.max=1)
+summary(ersnsttf1)
+
+ersnsttf2 <- ur.ers(difr$nsttf, type="DF-GLS", model="trend", lag.max=1)
+summary(ersnsttf2)
+
+
+kpssnsttf1 <- ur.kpss(as.vector(difr$nsttf), type="mu", lags="short")
+summary(kpssnsttf1)
+
+
+kpssnsttf2 <- ur.kpss(as.vector(difr$nsttf), type="tau", lags="short")
+summary(kpssnsttf2)
+
+
+#NS-BRENT
+#change ________________________________________________________________________
+
+ers1 <- ur.ers(difr$nsbrent, type="DF-GLS", model="const", lag.max=1)
+summary(ersnsttf1)
+
+ers2 <- ur.ers(difr$nsbrent, type="DF-GLS", model="trend", lag.max=1)
+summary(ersnsttf2)
+
+
+kpss1 <- ur.kpss(as.vector(difr$nsbrent), type="mu", lags="short")
+summary(kpssnsttf1)
+
+
+kpss2 <- ur.kpss(as.vector(difr$nsbrent), type="tau", lags="short")
+summary(kpssnsttf2)
+
+
+
+#CZH-NCG 
+
+ers1 <- ur.ers(difr$czhncg, type="DF-GLS", model="const", lag.max=1)
+summary(ers1)
+
+ers2 <- ur.ers(difr$czhncg, type="DF-GLS", model="trend", lag.max=1)
+summary(ers2)
+
+
+kpss1 <- ur.kpss(as.vector(difr$czhncg), type="mu", lags="short")
+summary(kpss1)
+
+
+kpss2 <- ur.kpss(as.vector(difr$czhncg), type="tau", lags="short")
+summary(kpss2)
+
+
+
+#LAT-NCG
+
+ers1 <- ur.ers(difr$latncg, type="DF-GLS", model="const", lag.max=1)
+summary(ers1)
+
+ers2 <- ur.ers(difr$latncg, type="DF-GLS", model="trend", lag.max=1)
+summary(ers2)
+
+
+kpss1 <- ur.kpss(as.vector(difr$latncg), type="mu", lags="short")
+summary(kpss1)
+
+
+kpss2 <- ur.kpss(as.vector(difr$latncg), type="tau", lags="short")
+summary(kpss2)
+
+
+
+
+#HH-NCG
+
+
+ers1 <- ur.ers(difr$hhncg, type="DF-GLS", model="const", lag.max=1)
+summary(ers1)
+
+ers2 <- ur.ers(difr$hhncg, type="DF-GLS", model="trend", lag.max=1)
+summary(ers2)
+
+
+kpss1 <- ur.kpss(as.vector(difr$hhncg), type="mu", lags="short")
+summary(kpss1)
+
+
+kpss2 <- ur.kpss(as.vector(difr$hhncg), type="tau", lags="short")
+summary(kpss2)
+
+#HH-GPL
+
+ers1 <- ur.ers(difr$hhgpl, type="DF-GLS", model="const", lag.max=1)
+summary(ers1)
+
+ers2 <- ur.ers(difr$hhgpl, type="DF-GLS", model="trend", lag.max=1)
+summary(ers2)
+
+
+kpss1 <- ur.kpss(as.vector(difr$hhgpl), type="mu", lags="short")
+summary(kpss1)
+
+
+kpss2 <- ur.kpss(as.vector(difr$hhgpl), type="tau", lags="short")
+summary(kpss2)
+
+
+
+#HH-TTF
+
+
+ers1 <- ur.ers(difr$hhttf, type="DF-GLS", model="const", lag.max=1)
+summary(ers1)
+
+ers2 <- ur.ers(difr$hhttf, type="DF-GLS", model="trend", lag.max=1)
+summary(ers2)
+
+
+kpss1 <- ur.kpss(as.vector(difr$hhttf), type="mu", lags="short")
+summary(kpss1)
+
+
+kpss2 <- ur.kpss(as.vector(difr$hhttf), type="tau", lags="short")
+summary(kpss2)
+
+#LNG-TTF
+
+ers1 <- ur.ers(difr$lngttf, type="DF-GLS", model="const", lag.max=1)
+summary(ers1)
+
+ers2 <- ur.ers(difr$lngttf, type="DF-GLS", model="trend", lag.max=1)
+summary(ers2)
+
+
+kpss1 <- ur.kpss(as.vector(difr$lngttf), type="mu", lags="short")
+summary(kpss1)
+
+
+kpss2 <- ur.kpss(as.vector(difr$lngttf), type="tau", lags="short")
+summary(kpss2)
+
+
+#LNG-HH
+
+ers1 <- ur.ers(difr$lnghh, type="DF-GLS", model="const", lag.max=1)
+summary(ers1)
+
+ers2 <- ur.ers(difr$lnghh, type="DF-GLS", model="trend", lag.max=1)
+summary(ers2)
+
+
+kpss1 <- ur.kpss(as.vector(difr$lnghh), type="mu", lags="short")
+summary(kpss1)
+
+
+kpss2 <- ur.kpss(as.vector(difr$lnghh), type="tau", lags="short")
+summary(kpss2)
+
+#BRENT-NCG
+
+ers1 <- ur.ers(difr$brentncg, type="DF-GLS", model="const", lag.max=1)
+summary(ers1)
+
+ers2 <- ur.ers(difr$brentncg, type="DF-GLS", model="trend", lag.max=1)
+summary(ers2)
+
+
+kpss1 <- ur.kpss(as.vector(difr$brentncg), type="mu", lags="short")
+summary(kpss1)
+
+
+kpss2 <- ur.kpss(as.vector(difr$brentncg), type="tau", lags="short")
+summary(kpss2)
+
+
+
+
+#Brent-GPL
+
+
+ers1 <- ur.ers(difr$brentgpl, type="DF-GLS", model="const", lag.max=1)
+summary(ers1)
+
+ers2 <- ur.ers(difr$brentgpl, type="DF-GLS", model="trend", lag.max=1)
+summary(ers2)
+
+
+kpss1 <- ur.kpss(as.vector(difr$brentgpl), type="mu", lags="short")
+summary(kpss1)
+
+
+kpss2 <- ur.kpss(as.vector(difr$brentgpl), type="tau", lags="short")
+summary(kpss2)
+
+#Brent-TTF
+
+
+ersbrttf1 <- ur.ers(difr$brentttf, type="DF-GLS", model="const", lag.max=1)
+summary(ersbrttf1)
+
+ersbrttf2 <- ur.ers(difr$brentttf, type="DF-GLS", model="trend", lag.max=1)
+summary(ersbrttf2)
+
+
+kpssbrttf1 <- ur.kpss(as.vector(difr$brentttf), type="mu", lags="short")
+summary(kpssbrttf1)
+
+
+kpssbrttf2 <- ur.kpss(as.vector(difr$brentttf), type="tau", lags="short")
+summary(kpssbrttf2)
+
+
+#BRENTTTF
+
+X0814
+
+X0814<- as.data.frame(X0814)
+
+
+
+kpssbrttf1 <- ur.kpss(as.vector(X0814$brentttf), type="mu", lags="short")
+summary(kpssbrttf1)
+
+
+
+ersbrttf2 <- ur.ers(X0814$brentttf, type="DF-GLS", model="trend", lag.max=1)
+summary(ersbrttf2)
+
+
+
+ersbrttf1 <- ur.ers(X0814$brentttf, type="DF-GLS", model="const", lag.max=1)
+summary(ersbrttf1)
+
+
+#COINTEGRATION FOR NON LOGS 
+X3diff<-as.data.frame(X3diff)
+X3diff
+
+
+
+
+FS13<- X3diff$ns
+FS14<-  X3diff$ttf
+
+FS_EGADF6 <- dynlm( window(FS13) ~ window(FS14))
+FS_EGADF6
+
+z_hat6 <- resid(FS_EGADF6)
+ur.df(z_hat6, lags = 1, type = "none", selectlags = "AIC")
+
+acf(z_hat6, lag=50)
+
+
+acf(difr$brentttf, lag=50)
+
+acf(X3diff$ns, lag=50)
+
+acf(X3diff$ns2,lag=30)
+
+ns11<- as.data.frame(X3diff$ns1)
+
+acf(ns11,lag=1)
+
+Book4<- as.data.frame(Book4)
+
+acf(Book4$ns1, lag=50)
+
+difer<- FS13 - FS14
+
+
+acf(difer, lag=50)
+
+#CHECKING GROWTH WIHOUT LOGS
+growth<- as.data.frame(growth)
+
+#NSFTTG
+ersbrttf1 <- ur.ers(growth$nsttf, type="DF-GLS", model="const", lag.max=1)
+summary(ersbrttf1)
+
+ersbrttf2 <- ur.ers(growth$nsttf, type="DF-GLS", model="trend", lag.max=1)
+summary(ersbrttf2)
+
+
+kpssbrttf1 <- ur.kpss(as.vector(growth$nsttf), type="mu", lags="short")
+summary(kpssbrttf1)
+
+
+kpssbrttf2 <- ur.kpss(as.vector(growth$nsttf), type="tau", lags="short")
+summary(kpssbrttf2)
+
+
+acf(growth$nsttf, lag=50)
+
+
+
+ersbrttf1 <- ur.ers(growth1$br, type="DF-GLS", model="const", lag.max=1)
+summary(ersbrttf1)
+
+ersbrttf2 <- ur.ers(growth1$br, type="DF-GLS", model="trend", lag.max=1)
+summary(ersbrttf2)
+
+
+kpssbrttf1 <- ur.kpss(as.vector(growth1$br), type="mu", lags="short")
+summary(kpssbrttf1)
+
+
+
+kpssbrttf2 <- ur.kpss(as.vector(growth1$br), type="tau", lags="short")
+summary(kpssbrttf2)
+
+
+
+	Brent-GPL	Brent-TTF
+
+
+
+growth0814<-as.data.frame(growth0814)
+
+FS1<- growth1$br
+FS2<-  growth1$ttf
+
+FS_EGADF1 <- dynlm( window(FS1) ~ window(FS2))
+FS_EGADF1
+
+z_hat1 <- resid(FS_EGADF1)
+ur.df(z_hat1, lags = 1, type = "none", selectlags = "AIC")
+
+rollo<- as.data.frame (growth$nsttf)
+install.packages("urca")
+
+i=1
+output=NULL
+while (i<150){correlation = cor(growth1$ns[i:(1+i)], growth1$gpl[i:(1+i)])
+
+              output = rbind(output,correlation)
+              i=i+1 }
+
+dim(output)
+plot(output)
+
+rollapply(growth["200802/01",2],4, mean )
+install.packages("tibbletime")
+
+install.packages("zoo")
+install.packages("tidyr")
+install.packages("dplyr")
+
+library(tibbletime)
+library(dplyr)
+library(tidyr)
+
+
+library(tidyverse)
+library(lubridate)
+library(tibbletime)
+
+
+data<- rollo
+
+
+mean_roll_5 <- rollify(mean, window = 5)
+
+
+z <- xts(ur.kpss(as.vector(growth1$br), type="tau", lags="short"))
+rollapply(z, 2, mean)
+
+
+m1<- growth1$br
+
+
+
+
+
+
+mean_roll_5 <- rollapply(mean, window = 5)
+
+install.packages("tidyquant")
+library(tidyquant)  
+library(cranlogs)   
+install.packages("tseries")
+library(tseries)
+
+
+
+
+function1<- function(x) {ur.kpss(as.vector(x), type="tau", lags="short")}
+
+test2 = rollapply(growth$nsncg, width=3,   FUN= finction1, by.column = FALSE, align = "right")
+print(test2)
+
+dato<- as.matrix(ur.kpss(as.vector(growth1$br), type="mu", lags="short"))
+dato
+
+customseries<- rollapply(dato[,2], width=1, FUN= mean , by.column=TRUE, fill=NA, align="right")
+
+plot(customseries)
+
+]
+
+
+library(zoo)
+library(tseries)
+z <- zoo(growth$nsncg, as.Date(growth$date))
+rolling<- rollapplyr(z, 20, kpss.test)
+rolling
+
+
+
+
+
+kpsstest <- function(x)
+{
+  kpssPvalue <-  adf.test(x)$p.value
+  kpssPvalue
+}
+
+PValue <- function(x) {
+  Pvalue <- rollapply(x, N, kpsstest)
+  Pvalue
+}
+
+z <- zoo(growth$nsncg, as.Date(growth$date))
+roollaply<- rollapplyr(z, 10, function(u) adf.test(u)$p.value)
+plot(rollply)
+
+
+library(zoo)
+library(tseries)
+z <- zoo(rnorm(100), as.Date(1:100))
+
+
+PValue <- function(x) {
+  Pvalue <- rollapply(x, 2, kpsstest)
+  Pvalue
+}
+#t0 <- 30
+
+
+cols <- as.vector(c(growth$nsncg, growth$nsgpl, growth$nsttf, growth$nsbrent ))
+
+
+growth
+install.packages("ggplot2")
+
+library(ggplot2)
+install.packages("xts", repos="http://cloud.r-project.org")
+library("xts")
+install.packages("urca")
+library(urca)
+
+
+
+
+
+kpsstest <- function(x)
+{
+  kpssPvalue <-  ur.kpss(x)@teststat 
+  
+  return(kpssPvalue)
+  
+}
+
+kpsscv <- function(x)
+{
+  kpssPvalue <-  ur.kpss(x)@cval 
+  
+  return(kpssPvalue)
+  
+}
+
+for (t0 in 1:9) {
+  kpssres <- c()
+  kpsscvv <- c()
+  
+  for(i in 1:(149-t0)) {
+    temp <- growth[t0:(i+t0),]
+    #print(temp)
+    z <- xts(temp$nsgpl, as.Date(temp$date))
+    
+    kpssres <- rbind(kpssres, kpsstest(z))
+    kpsscvv <- rbind(kpsscvv, kpsscv(z))
+  
+  }
+
+  kpssros<-as.data.frame(kpssres)
+
+  
+  df <- as.data.frame(kpssros$V1)
+  temp2 <- growth[(t0+1):149,]
+  
+  df$date <-temp2$date
+  rownames(df) <- df$date
+  #print('df  --- ')
+  #print(head(df))
+  #print('df1 --- ')
+  df1 <- as.data.frame(kpsscvv)
+  df1$teststat <- df$'kpssros$V1'
+  df1$date <- df$date
+  #print('df1 --- ')
+  #print(head(df1))
+  
+  colnames (df1)<- c("ten", "five", "two", "one","teststat", "date")
+  rownames(df1) <- df1$date
+  df<-c()
+  df<-df1
+  print(head(df))
+  plot(x=df$date, y=df$teststat , main = paste("Nord Stream - GPL for t0=",  df$date[1])  , ylim=range(c(0,0.8)), xlab = "Expanding time window",    ylab = "KPSS test statistic & Critical Values")
+  par(new = TRUE) 
+  plot(x=df$date, y= df$ten, pch = 17, col = 4, type="l", lwd=2,  ylim=range(c(0,0.8)), axes = FALSE, xlab = "", ylab = "") #axes = FALSE
+  par(new = TRUE)  
+  plot(x=df$date, y= df$five, pch = 17, col = 16, type="l", lwd=2,   ylim=range(c(0,0.8)), axes = FALSE, xlab = "", ylab = "") 
+  par(new = TRUE) 
+  plot(x=df$date, y= df$one, pch = 17, col = 6, type="l", lwd=2,  ylim=range(c(0,0.8)), axes = FALSE, xlab = "", ylab = "") 
+}
+
+
+
+
+
+
+
+plot(x=df$date, y=df$teststat , main = paste("Nord Stream - GPL for t0=",  df$date[1])  , ylim=range(c(0,0.8)), xlab = "Expanding time window",    ylab = "KPSS test statistic & Critical Values")
+par(new = TRUE) 
+plot(x=df$date, y= df$ten, pch = 17, col = 4, type="l", lwd=2,  ylim=range(c(0,0.8)), axes = FALSE, xlab = "", ylab = "") #axes = FALSE
+par(new = TRUE)  
+plot(x=df$date, y= df$five, pch = 17, col = 16, type="l", lwd=2,   ylim=range(c(0,0.8)), axes = FALSE, xlab = "", ylab = "") 
+par(new = TRUE) 
+plot(x=df$date, y= df$one, pch = 17, col = 6, type="l", lwd=2,  ylim=range(c(0,0.8)), axes = FALSE, xlab = "", ylab = "")
+
+
+
+
+
+
+
+
